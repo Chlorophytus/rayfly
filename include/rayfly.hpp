@@ -25,8 +25,10 @@
 #include <cstdint>
 #include <cstdio>
 #include <exception>
+#include <forward_list>
 #include <glm/glm.hpp>
 #include <memory>
+#include <random>
 #include <raylib.h>
 #include <stdexcept>
 #include <string>
@@ -50,3 +52,5 @@ using F64 = double;
 // CONSTANTS
 // =============================================================================
 constexpr static auto RAD2DEGS = 360 / (2 * M_PIf32);
+constexpr static auto HEIGHTMAP_SIZE = 16;
+constexpr static auto HEIGHTMAP_SCALE = 16;

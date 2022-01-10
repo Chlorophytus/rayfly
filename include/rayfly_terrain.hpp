@@ -1,4 +1,4 @@
-/// rayfly: simulation include
+/// rayfly: terragen include
 // Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
@@ -15,17 +15,8 @@
 #pragma once
 #include "rayfly.hpp"
 namespace rayfly {
-namespace sim {
-
-struct terrain_data {
-  S32 x;
-  Model y;
-  S32 z;
-};
-
-std::vector<F32> get_joystick_axes(const U8);
-void init(const U16, const U16, const U16, const bool);
-void tick(U8 &);
-void deinit();
-} // namespace sim
+namespace terrain {
+void init();
+Model chunk(const S32, const S32);
+} // namespace terrain
 } // namespace rayfly

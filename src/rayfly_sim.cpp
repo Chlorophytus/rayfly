@@ -13,8 +13,46 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "../include/rayfly_sim.hpp"
+#include "../include/rayfly_terrain.hpp"
 #include "../include/rayfly_util.hpp"
 using namespace rayfly;
+
+static auto ter = std::forward_list<sim::terrain_data>{};
+constexpr static auto frag = std::string_view{
+    "#version 430\n"
+
+    "in vec2 fragTexCoord;\n"
+    "in vec4 fragColor;\n"
+
+    "uniform sampler2D texture0;\n"
+    "uniform vec4 colDiffuse;\n"
+
+    "out vec4 finalColor;\n"
+
+    "void main() { \n"
+    "  vec4 texelColor = texture(texture0, fragTexCoord);"
+    "  finalColor = texelColor * colDiffuse * vec4(0.05f, 1.0f, 0.05f, 1.0f);\n"
+    "}\n"};
+constexpr static auto vert = std::string_view{
+    "#version 430\n"
+
+    "in vec3 vertexPosition;\n"
+    "in vec2 vertexTexCoord;\n"
+    "in vec3 vertexNormal;\n"
+    "in vec4 vertexColor;\n"
+
+    "uniform mat4 mvp;\n"
+
+    "out vec2 fragTexCoord;\n"
+    "out vec4 fragColor;\n"
+
+    "void main() { \n"
+    "  fragTexCoord = vertexTexCoord;\n"
+    "  fragColor = vertexColor * vec4(0.05f, 1.0f, 0.05f, 1.0f);\n"
+    "  gl_Position = mvp * vec4(vertexPosition, 1.0);\n"
+    "}\n"};
+
+static auto shaders = Shader{};
 
 static auto camera = Camera3D{.position = Vector3{.x = 5, .y = 5, .z = 0},
                               .target = Vector3{.x = 0, .y = 0, .z = 0},
@@ -69,6 +107,16 @@ void sim::init(const U16 width, const U16 height, const U16 fps_target = 60,
     // This is an XOR, it is useful here.
     if (fullscreen ^ IsWindowFullscreen()) {
       ToggleFullscreen();
+    }
+
+    terrain::init();
+
+    shaders = LoadShaderFromMemory(vert.data(), frag.data());
+
+    for (auto i = -4; i < 5; i++) {
+      for (auto j = -4; j < 5; j++) {
+        ter.emplace_front(sim::terrain_data{i, terrain::chunk(i, j), j});
+      }
     }
 
     init_ok = true;
@@ -143,16 +191,16 @@ void sim::tick(U8 &joystick) {
   BeginDrawing();
   ClearBackground(RAYWHITE);
   BeginMode3D(camera);
-  DrawGrid(10, 1.0f);
-  DrawRay(
-      Ray{.position = Vector3{0}, .direction = Vector3{.x = 1, .y = 0, .z = 0}},
-      RED);
-  DrawRay(
-      Ray{.position = Vector3{0}, .direction = Vector3{.x = 0, .y = 1, .z = 0}},
-      GREEN);
-  DrawRay(
-      Ray{.position = Vector3{0}, .direction = Vector3{.x = 0, .y = 0, .z = 1}},
-      BLUE);
+
+  BeginShaderMode(shaders);
+  for (auto &&t : ter) {
+    t.y.materials[0].shader = shaders;
+    DrawModel(t.y,
+              Vector3{(t.x * HEIGHTMAP_SCALE) - (HEIGHTMAP_SCALE / 2), 0,
+                      (t.z * HEIGHTMAP_SCALE) - (HEIGHTMAP_SCALE / 2)},
+              1.0f, GRAY);
+  }
+  EndShaderMode();
   DrawTriangle3D(
       raylib_cast3(position + (glm::vec3{0.0f, 0.0f, 0.5f} * controls_angular)),
       raylib_cast3(position + (glm::vec3{1.0f, 0.0f, 0.0f} * controls_angular)),
@@ -231,6 +279,10 @@ void sim::tick(U8 &joystick) {
 }
 
 void sim::deinit() {
+  UnloadShader(shaders);
+  for (auto &&t : ter) {
+    UnloadModel(t.y);
+  }
   CloseWindow();
   init_ok = false;
 }
