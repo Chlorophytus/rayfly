@@ -13,16 +13,20 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #pragma once
+#include "../include/rayfly_cfg.hpp"
 // =============================================================================
 // EXTERNAL INCLUDE HEADERS
 // =============================================================================
 #include <GLFW/glfw3.h>
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <exception>
 #include <glm/glm.hpp>
+#include <memory>
 #include <raylib.h>
 #include <stdexcept>
 #include <string>
@@ -42,3 +46,7 @@ using S64 = std::int64_t;
 
 using F32 = float;
 using F64 = double;
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+constexpr static auto RAD2DEGS = 360 / (2 * M_PIf32);

@@ -1,4 +1,4 @@
-/// rayfly: main source
+/// rayfly: utility include
 // Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
@@ -12,24 +12,14 @@
 // WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#include "../include/rayfly.hpp"
-#include "../include/rayfly_sim.hpp"
-using namespace rayfly;
-
-int main(int argc, char **argv) {
-  auto status = EXIT_FAILURE;
-
-  try {
-    auto joystick = U8{0};
-    sim::init(1280, 720, 60, false);
-    while (!WindowShouldClose()) {
-      sim::tick(joystick);
-    }
-    sim::deinit();
-    std::fprintf(stderr, "bye\n");
-    status = EXIT_SUCCESS;
-  } catch (const std::exception &e) {
-    std::fprintf(stderr, "FATAL: %s\n", e.what());
-  }
-  return status;
+#pragma once
+#include "rayfly.hpp"
+namespace rayfly {
+namespace util {
+// https://stackoverflow.com/a/29871193
+template <typename T> void wrap(T &num, T min, T max) {
+  const auto maxmin = max - min;
+  num = min + glm::mod(maxmin + glm::mod(num - min, maxmin), maxmin);
 }
+} // namespace util
+} // namespace rayfly

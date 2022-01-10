@@ -1,7 +1,7 @@
 # Minimum CMake version is 3.22
 cmake_minimum_required(VERSION 3.22)
 
-project(rayfly VERSION 0.1.0.1)
+project(rayfly VERSION 0.1.0.2)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(GRAPHICS GRAPHICS_API_OPENGL_43)
@@ -17,6 +17,7 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 add_executable(${PROJECT_NAME}
+  src/${PROJECT_NAME}_sim.cpp
   src/${PROJECT_NAME}.cpp
 )
 # CONTROVERSIAL TAKE: WSL is becoming better. We should be able to play games

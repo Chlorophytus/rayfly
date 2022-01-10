@@ -1,4 +1,4 @@
-/// rayfly: main source
+/// rayfly: simulation include
 // Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
@@ -12,24 +12,13 @@
 // WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#include "../include/rayfly.hpp"
-#include "../include/rayfly_sim.hpp"
-using namespace rayfly;
-
-int main(int argc, char **argv) {
-  auto status = EXIT_FAILURE;
-
-  try {
-    auto joystick = U8{0};
-    sim::init(1280, 720, 60, false);
-    while (!WindowShouldClose()) {
-      sim::tick(joystick);
-    }
-    sim::deinit();
-    std::fprintf(stderr, "bye\n");
-    status = EXIT_SUCCESS;
-  } catch (const std::exception &e) {
-    std::fprintf(stderr, "FATAL: %s\n", e.what());
-  }
-  return status;
-}
+#pragma once
+#include "rayfly.hpp"
+namespace rayfly {
+namespace sim {
+std::vector<F32> get_joystick_axes(const U8);
+void init(const U16, const U16, const U16, const bool);
+void tick(U8 &);
+void deinit();
+} // namespace sim
+} // namespace rayfly
