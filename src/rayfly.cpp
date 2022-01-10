@@ -25,118 +25,159 @@ void wrap(F32 &num, F32 min, F32 max) {
   num = min + std::fmod(maxmin + std::fmod(num - min, maxmin), maxmin);
 }
 
-Vector3 raylib_cast(glm::vec3 v) { return Vector3{.x=v.x, .y=v.y, .z=v.z}; }
+Vector3 raylib_cast(glm::vec3 v) {
+  return Vector3{.x = v.x, .y = v.y, .z = v.z};
+}
 
 int main(int argc, char **argv) {
   auto status = EXIT_FAILURE;
 
   try {
-    InitWindow(
-        WIDTH, HEIGHT,
-        (std::string{"rayfly "} + rayfly_VSTRING_FULL).c_str());
+    InitWindow(WIDTH, HEIGHT,
+               (std::string{"rayfly "} + rayfly_VSTRING_FULL).c_str());
     SetTargetFPS(60);
-    if (!IsWindowFullscreen()) {
+    if (IsWindowFullscreen()) {
       ToggleFullscreen();
     }
-    auto camera = Camera3D{
-      .position = Vector3{.x = 5, .y = 5, .z = 0},
-      .target = Vector3{.x = 0, .y = 0, .z = 0},
-      .up = Vector3{.x = 0, .y = 1, .z = 0},
-      .fovy = 110.0f,
-      .projection = CAMERA_PERSPECTIVE
-    };
-
+    auto camera = Camera3D{.position = Vector3{.x = 5, .y = 5, .z = 0},
+                           .target = Vector3{.x = 0, .y = 0, .z = 0},
+                           .up = Vector3{.x = 0, .y = 1, .z = 0},
+                           .fovy = 110.0f,
+                           .projection = CAMERA_PERSPECTIVE};
 
     auto position = glm::vec3{0.0f, 1.0f, 0.0f};
     auto velocity = glm::vec3{0.0f, 0.0f, 0.0f};
-    auto controlZ = glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    auto controlY = glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    auto controlX = glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-
-    auto control_yaw = 0.0f; // z
+    auto controlZ =
+        glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    auto controlY =
+        glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    auto controlX =
+        glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    auto final_matrix = glm::mat3{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    auto control_yaw = 0.0f;   // z
     auto control_pitch = 0.0f; // y'
-    auto control_roll = 0.0f; // x''
+    auto control_roll = 0.0f;  // x''
     auto control_mag = 0.0f;
     while (!WindowShouldClose()) {
       BeginDrawing();
       ClearBackground(RAYWHITE);
       const auto js = 0;
       // HACK: VERY UGLY but low-level GLFW calls are supported in Raylib!
-      if(glfwJoystickPresent(js)) {
+      if (glfwJoystickPresent(js)) {
         auto axis_count = S32{0};
-        auto axis = glfwGetJoystickAxes(js, &axis_count); 		
-        std::fprintf(stderr, "detected %u axes\n", axis_count);
-        for(auto i = 0; i < axis_count; i++) {
-          std::fprintf(stderr, "%u: %f\n", i, axis[i]);
-        }
-        // delta_roll = std::clamp(std::fmod(delta_roll + (axis[5] * (2.0f * M_PIf32) * 0.0005f), M_PIf32 * 2.0f), -0.1f, 0.1f);
-        // delta_yaw = std::fmod(delta_yaw + (axis[0] * (2.0f * M_PIf32) * 0.005f), M_PIf32 * 2.0f);
-        // delta_pitch = std::fmod(delta_pitch + (axis[1] * (2.0f * M_PIf32) * 0.005f), M_PIf32 * 2.0f);
-        
-        control_mag = std::min(control_mag * 0.995f + ((1.0f - axis[2]) * 0.00001f), 0.005f);
-        control_roll *= 0.99f;
-        control_pitch *= 0.99f;
-        control_yaw *= 0.99f;
-        control_roll -= 0.001f * (axis[0] * M_PI_2f32); // z
-        control_pitch -= 0.001f * (axis[1] * M_PI_2f32); // y'
-        control_yaw += 0.002f * (axis[5] * M_PI_2f32); // x''
+        auto axis = glfwGetJoystickAxes(js, &axis_count);
+        // std::fprintf(stderr, "detected %u axes\n", axis_count);
+        // for (auto i = 0; i < axis_count; i++) {
+        //   std::fprintf(stderr, "%u: %f\n", i, axis[i]);
+        // }
+        // delta_roll = std::clamp(std::fmod(delta_roll + (axis[5] * (2.0f *
+        // M_PIf32) * 0.0005f), M_PIf32 * 2.0f), -0.1f, 0.1f); delta_yaw =
+        // std::fmod(delta_yaw + (axis[0] * (2.0f * M_PIf32) * 0.005f), M_PIf32
+        // * 2.0f); delta_pitch = std::fmod(delta_pitch + (axis[1] * (2.0f *
+        // M_PIf32) * 0.005f), M_PIf32 * 2.0f);
+
+        control_mag = std::min(
+            control_mag * 0.995f + ((1.0f - axis[2]) * 0.00001f), 0.01f);
+        control_roll *= 0.999f;
+        control_pitch *= 0.999f;
+        // control_yaw *= 0.99f;
+        control_roll -= 0.01f * (axis[0] * M_PI_2f32); // z
+        control_pitch -= 0.02f * (axis[1] * M_PI_2f32); // y'
+        control_yaw -= 0.005f * (axis[5] * M_PI_2f32);  // x''
         wrap(control_yaw, -M_PIf32, M_PIf32);
         wrap(control_pitch, -M_PIf32, M_PIf32);
         wrap(control_roll, -M_PIf32, M_PIf32);
 
-        controlX = glm::mat3{
-          1.0f, 0.0f, 0.0f,
-          0.0f, std::cos(control_yaw), -std::sin(control_yaw),
-          0.0f, std::sin(control_yaw), std::cos(control_yaw)
-        };
+        controlX = glm::mat3{std::cos(control_yaw),
+                             0.0f,
+                             std::sin(control_yaw),
+                             0.0f,
+                             1.0f,
+                             0.0f,
+                             -std::sin(control_yaw),
+                             0.0f,
+                             std::cos(control_yaw)};
 
-        controlY = glm::mat3{
-          std::cos(control_roll), 0.0f, std::sin(control_roll),
-          0.0f, 1.0f, 0.0f, 
-          -std::sin(control_roll), 0.0f, std::cos(control_roll)
-        };
+        controlY = glm::mat3{std::cos(control_pitch),
+                             -std::sin(control_pitch),
+                             0.0f,
+                             std::sin(control_pitch),
+                             std::cos(control_pitch),
+                             0.0f,
+                             0.0f,
+                             0.0f,
+                             1.0f};
 
-        controlZ = glm::mat3{
-          std::cos(control_pitch), -std::sin(control_pitch), 0.0f,
-          std::sin(control_pitch), std::cos(control_pitch), 0.0f,
-          0.0f, 0.0f, 1.0f
-        };
-        velocity -= glm::vec3{control_mag, 0.0f, 0.0f} * (controlZ * controlY * controlX);
-        if(position.x > 0.0f) { velocity -= glm::vec3{0.0f, 0.00001f, 0.0f}; }
+        controlZ = glm::mat3{1.0f,
+                             0.0f,
+                             0.0f,
+                             0.0f,
+                             std::cos(control_roll),
+                             -std::sin(control_roll),
+                             0.0f,
+                             std::sin(control_roll),
+                             std::cos(control_roll)};
+        final_matrix = controlZ * controlY * controlX;
+        velocity -= glm::vec3{control_mag, 0.0f, 0.0f} * final_matrix;
+        auto gravity = glm::smoothstep(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.01f, 1.0f, 0.01f}, glm::vec3{0.0f, position.y, 0.0f});
+        gravity *= 0.0015f;
+        velocity -= gravity;
         velocity *= 0.75f;
         position += velocity;
       }
-      camera.up = raylib_cast(position - (glm::normalize(velocity) * (controlZ * controlY * controlX)));
-      camera.position = raylib_cast(position - glm::normalize(velocity));
+      auto final_matrix = (controlZ * controlY * controlX);
+      auto up = glm::vec3{0.0f, 1.0f, 0.0f} * final_matrix;
+      camera.up = raylib_cast(up);
+      camera.position =
+          raylib_cast(position - (glm::normalize(velocity) * 2.0f) + up);
       camera.target = raylib_cast(position);
-      
-      DrawText((std::string{"Cmag   "} + std::to_string(control_mag)).c_str(), 50, 50, 20, GRAY);
-      DrawText((std::string{"Cpitch "} + std::to_string(control_pitch * RAD2DEGS) + "degs").c_str(), 50, 75, 20, GRAY);
-      DrawText((std::string{"Cyaw   "} + std::to_string(control_yaw * RAD2DEGS) + "degs").c_str(), 50, 100, 20, GRAY);
-      DrawText((std::string{"Croll  "} + std::to_string(control_roll * RAD2DEGS) + "degs").c_str(), 50, 125, 20, GRAY);
-      DrawText((std::string{"Vmag   "} + std::to_string(glm::length(velocity))).c_str(), 50, 150, 20, GRAY);
+
+      DrawText((std::string{"Cmag   "} + std::to_string(control_mag)).c_str(),
+               50, 50, 20, GRAY);
+      DrawText((std::string{"Cpitch "} +
+                std::to_string(control_pitch * RAD2DEGS) + "degs")
+                   .c_str(),
+               50, 75, 20, GRAY);
+      DrawText((std::string{"Cyaw   "} +
+                std::to_string(control_yaw * RAD2DEGS) + "degs")
+                   .c_str(),
+               50, 100, 20, GRAY);
+      DrawText((std::string{"Croll  "} +
+                std::to_string(control_roll * RAD2DEGS) + "degs")
+                   .c_str(),
+               50, 125, 20, (std::abs(control_roll) > M_PI_4f32 ? RED : GRAY));
+      DrawText((std::string{"Vmag   "} + std::to_string(glm::length(velocity)))
+                   .c_str(),
+               50, 150, 20, GRAY);
       DrawLineV(Vector2{.x = 96, .y = HEIGHT - 96},
-                Vector2{
-                  .x = 96 + (std::sin(control_roll - M_PI_2f32) * 64.0f),
-                  .y = HEIGHT - 96 + (std::cos(control_roll - M_PI_2f32) * 64.0f)},
-                GRAY); 
+                Vector2{.x = 96 + (std::sin(control_roll - M_PI_2f32) * 64.0f),
+                        .y = HEIGHT - 96 +
+                             (std::cos(control_roll - M_PI_2f32) * 64.0f)},
+                GRAY);
       DrawLineV(Vector2{.x = 96, .y = HEIGHT - 96},
-                Vector2{
-                  .x = 96 + (std::sin(control_roll + M_PI_2f32) * 64.0f),
-                  .y = HEIGHT - 96 + (std::cos(control_roll + M_PI_2f32) * 64.0f)},
-                GRAY); 
+                Vector2{.x = 96 + (std::sin(control_roll + M_PI_2f32) * 64.0f),
+                        .y = HEIGHT - 96 +
+                             (std::cos(control_roll + M_PI_2f32) * 64.0f)},
+                GRAY);
       DrawLineV(Vector2{.x = 96, .y = HEIGHT - 96},
-                Vector2{
-                  .x = 96 + (std::sin(control_roll - M_PIf32) * 32.0f),
-                  .y = HEIGHT - 96 + (std::cos(control_roll - M_PIf32) * 32.0f)},
-                BLACK); 
+                Vector2{.x = 96 + (std::sin(control_roll - M_PIf32) * 32.0f),
+                        .y = HEIGHT - 96 +
+                             (std::cos(control_roll - M_PIf32) * 32.0f)},
+                BLACK);
       BeginMode3D(camera);
       DrawGrid(10, 1.0f);
       const auto o = Vector3{0};
-      DrawRay(Ray{.position = o, .direction = Vector3{.x = 1, .y = 0, .z = 0}}, RED);
-      DrawRay(Ray{.position = o, .direction = Vector3{.x = 0, .y = 1, .z = 0}}, GREEN);
-      DrawRay(Ray{.position = o, .direction = Vector3{.x = 0, .y = 0, .z = 1}}, BLUE);
-      DrawLine3D(raylib_cast(position), raylib_cast(position + velocity), BLACK);
+      DrawRay(Ray{.position = o, .direction = Vector3{.x = 1, .y = 0, .z = 0}},
+              RED);
+      DrawRay(Ray{.position = o, .direction = Vector3{.x = 0, .y = 1, .z = 0}},
+              GREEN);
+      DrawRay(Ray{.position = o, .direction = Vector3{.x = 0, .y = 0, .z = 1}},
+              BLUE);
+      DrawTriangle3D(
+          raylib_cast(position + (glm::vec3{-1.0f, 0.0f, -0.5f} * final_matrix)),
+          raylib_cast(position + (glm::vec3{-2.0f, 0.0f, 0.0f} * final_matrix)),
+          raylib_cast(position + (glm::vec3{-1.0f, 0.0f, 0.5f} * final_matrix)),
+          GRAY);
       EndMode3D();
       EndDrawing();
     }

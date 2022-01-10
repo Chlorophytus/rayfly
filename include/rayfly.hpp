@@ -16,13 +16,13 @@
 // =============================================================================
 // EXTERNAL INCLUDE HEADERS
 // =============================================================================
-#include <exception>
+#include <GLFW/glfw3.h>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
-#include <cmath>
+#include <exception>
 #include <glm/glm.hpp>
-#include <GLFW/glfw3.h>
 #include <raylib.h>
 #include <stdexcept>
 #include <string>

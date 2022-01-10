@@ -1,7 +1,7 @@
 # Minimum CMake version is 3.22
 cmake_minimum_required(VERSION 3.22)
 
-project(rayfly VERSION 0.1.0.0)
+project(rayfly VERSION 0.1.0.1)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(GRAPHICS GRAPHICS_API_OPENGL_43)
