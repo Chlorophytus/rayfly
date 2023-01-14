@@ -1,5 +1,5 @@
 /// rayfly: utility include
-// Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
+// Copyright (c) 2021-2023 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above

@@ -1,5 +1,5 @@
 /// rayfly: simulation
-// Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
+// Copyright (c) 2021-2023 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +13,6 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "../include/rayfly_sim.hpp"
-#include "../include/rayfly_terrain.hpp"
 #include "../include/rayfly_util.hpp"
 using namespace rayfly;
 

@@ -1,5 +1,5 @@
 /// rayfly: main include
-// Copyright (c) 2021-2022 Roland Metivier <metivier.roland@chlorophyt.us>
+// Copyright (c) 2021-2023 Roland Metivier <metivier.roland@chlorophyt.us>
 //
 // Permission to use, copy, modify, and distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -18,21 +18,9 @@
 // EXTERNAL INCLUDE HEADERS
 // =============================================================================
 #include <GLFW/glfw3.h>
-#include <algorithm>
-#include <array>
-#include <chrono>
-#include <cmath>
-#include <cstdint>
-#include <cstdio>
-#include <exception>
-#include <forward_list>
+#include <bits/stdc++.h>
 #include <glm/glm.hpp>
-#include <memory>
-#include <random>
 #include <raylib.h>
-#include <stdexcept>
-#include <string>
-#include <thread>
 // =============================================================================
 // TYPEDEFS
 // =============================================================================
