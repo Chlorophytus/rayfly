@@ -41,7 +41,7 @@ Vector3 raylib_cast3(glm::vec3 v) {
   return Vector3{.x = v.x, .y = v.y, .z = v.z};
 }
 
-std::vector<F32> sim::get_joystick_axes(const U8 joystick_idx) {
+std::vector<F32> sim::get_joystick_axes(const U32 joystick_idx) {
   if (glfwJoystickPresent(joystick_idx)) {
     auto axis_count = S32{0};
     auto axis_carray = glfwGetJoystickAxes(joystick_idx, &axis_count);
@@ -58,7 +58,7 @@ std::vector<F32> sim::get_joystick_axes(const U8 joystick_idx) {
   }
 }
 
-void sim::init(const U16 width, const U16 height, const U16 fps_target = 60,
+void sim::init(const U32 width, const U32 height, const U32 fps_target = 60,
                const bool fullscreen = false) {
   if (!init_ok) {
     init_width = width;
@@ -78,7 +78,7 @@ void sim::init(const U16 width, const U16 height, const U16 fps_target = 60,
   }
 }
 
-void sim::tick(U8 &joystick) {
+void sim::tick(U32 &joystick) {
   auto axes = sim::get_joystick_axes(joystick);
 
   auto controls_raw = glm::vec3{axes.at(5), -axes.at(1), -axes.at(0)};

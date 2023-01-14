@@ -1,7 +1,7 @@
 # Minimum CMake version is 3.22
 cmake_minimum_required(VERSION 3.22)
 
-project(rayfly VERSION 0.1.0.5)
+project(rayfly VERSION 0.1.0.6)
 
 add_subdirectory(vendor/raylib/)
 

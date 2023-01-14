@@ -16,16 +16,9 @@
 #include "rayfly.hpp"
 namespace rayfly {
 namespace sim {
-
-struct terrain_data {
-  S32 x;
-  Model y;
-  S32 z;
-};
-
-std::vector<F32> get_joystick_axes(const U8);
-void init(const U16, const U16, const U16, const bool);
-void tick(U8 &);
+std::vector<F32> get_joystick_axes(const U32);
+void init(const U32, const U32, const U32, const bool);
+void tick(U32 &);
 void deinit();
 } // namespace sim
 } // namespace rayfly
