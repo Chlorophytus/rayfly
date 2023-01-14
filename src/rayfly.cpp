@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   auto status = EXIT_FAILURE;
 
   try {
-    auto joystick = U8{0};
+    auto joystick = U8{1};
     sim::init(1280, 720, 60, false);
     while (!WindowShouldClose()) {
       sim::tick(joystick);

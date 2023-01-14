@@ -102,3 +102,4 @@ _deps
 ### Vendor
 rayfly_cfg.hpp
 CPack*
+build
